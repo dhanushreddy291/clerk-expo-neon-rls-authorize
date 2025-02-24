@@ -1,6 +1,7 @@
 import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-zod';
 
-export const todosTable = pgTable('todos', {
+export const todos = pgTable('todos', {
     id: serial('id').primaryKey(),
     title: text('title'),
     completed: text('completed'),
@@ -12,3 +13,5 @@ export const todosTable = pgTable('todos', {
         .$onUpdate(() => new Date()),
     user_id: text('user_id'),
 });
+
+export const todoSelectSchema = createSelectSchema(todos);

@@ -1,74 +1,129 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { todoSelectSchema } from '@/db/schema';
+import { z } from 'zod';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const API_URL = '/todos';
 
-export default function HomeScreen() {
+export default function TodoApp() {
+  const [todos, setTodos] = useState<(z.infer<typeof todoSelectSchema>)[]>([]);
+  const [newTitle, setNewTitle] = useState('');
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const fetchTodos = async () => {
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json() as z.infer<typeof todoSelectSchema>[];
+      setTodos(data);
+    } catch (error) {
+      console.error('Error fetching todos:', error);
+    }
+  };
+
+  const addTodo = async () => {
+    if (!newTitle.trim()) return;
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle, completed: 'false', user_id: null }),
+      });
+      if (response.ok) {
+        setNewTitle('');
+        fetchTodos();
+      }
+    } catch (error) {
+      console.error('Error adding todo:', error);
+    }
+  };
+
+  const deleteTodo = async (id: number) => {
+    try {
+      await fetch(
+        `${API_URL}`,
+        {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        }
+      );
+      fetchTodos();
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
+  };
+
+  const updateTodo = async (id: number, updatedTitle: string) => {
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: updatedTitle, completed: 'false' }),
+      });
+      fetchTodos();
+    } catch (error) {
+      console.error('Error updating todo:', error);
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Todo List</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter a new todo"
+        value={newTitle}
+        onChangeText={setNewTitle}
+      />
+      <Button title="Add Todo" onPress={addTodo} />
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.todoItem}>
+            <Text>{item.title}</Text>
+            <View style={styles.buttons}>
+              <TouchableOpacity onPress={() => deleteTodo(item.id)}>
+                <Text style={styles.deleteButton}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  todoItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    padding: 10,
+    borderBottomWidth: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  buttons: {
+    flexDirection: 'row',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  deleteButton: {
+    color: 'red',
   },
 });
