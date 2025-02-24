@@ -8,6 +8,8 @@ const API_URL = '/todos';
 export default function TodoApp() {
   const [todos, setTodos] = useState<(z.infer<typeof todoSelectSchema>)[]>([]);
   const [newTitle, setNewTitle] = useState('');
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState('');
 
   useEffect(() => {
     fetchTodos();
@@ -16,7 +18,7 @@ export default function TodoApp() {
   const fetchTodos = async () => {
     try {
       const response = await fetch(API_URL);
-      const data = await response.json() as z.infer<typeof todoSelectSchema>[];
+      const data = (await response.json()) as z.infer<typeof todoSelectSchema>[];
       setTodos(data);
     } catch (error) {
       console.error('Error fetching todos:', error);
@@ -42,14 +44,11 @@ export default function TodoApp() {
 
   const deleteTodo = async (id: number) => {
     try {
-      await fetch(
-        `${API_URL}`,
-        {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id })
-        }
-      );
+      await fetch(`${API_URL}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
       fetchTodos();
     } catch (error) {
       console.error('Error deleting todo:', error);
@@ -58,15 +57,26 @@ export default function TodoApp() {
 
   const updateTodo = async (id: number, updatedTitle: string) => {
     try {
-      await fetch(`${API_URL}/${id}`, {
+      await fetch(`${API_URL}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: updatedTitle, completed: 'false' }),
+        body: JSON.stringify({ title: updatedTitle, completed: 'false', id }),
       });
       fetchTodos();
     } catch (error) {
       console.error('Error updating todo:', error);
     }
+  };
+
+  const startEditing = (id: number, title: string) => {
+    setEditingId(id);
+    setEditingText(title);
+  };
+
+  const saveEdit = async (id: number) => {
+    if (!editingText.trim()) return;
+    await updateTodo(id, editingText);
+    setEditingId(null);
   };
 
   return (
@@ -84,7 +94,19 @@ export default function TodoApp() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.todoItem}>
-            <Text>{item.title}</Text>
+            {editingId === item.id ? (
+              <TextInput
+                style={styles.input}
+                value={editingText}
+                onChangeText={setEditingText}
+                onBlur={() => saveEdit(item.id)}
+                autoFocus
+              />
+            ) : (
+              <TouchableOpacity onLongPress={() => startEditing(item.id, item.title || '')}>
+                <Text>{item.title}</Text>
+              </TouchableOpacity>
+            )}
             <View style={styles.buttons}>
               <TouchableOpacity onPress={() => deleteTodo(item.id)}>
                 <Text style={styles.deleteButton}>Delete</Text>

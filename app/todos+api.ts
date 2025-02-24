@@ -1,9 +1,10 @@
 import { todos } from "@/db/schema";
 import { db } from "@/db/drizzle";
 import { eq } from "drizzle-orm";
+import { desc } from 'drizzle-orm';
 
 export async function GET(request: Request) {
-    const user_todos = await db.select().from(todos);
+    const user_todos = await db.select().from(todos).orderBy(desc(todos.updated_at));
     return Response.json(user_todos);
 }
 
