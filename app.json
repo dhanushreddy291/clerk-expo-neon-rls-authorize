@@ -38,7 +38,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
@@ -50,6 +51,10 @@
       "eas": {
         "projectId": "0bdbf5cf-7583-4aaa-aa5f-0807e9556a40"
       }
-    }
+    },
+    "fonts": [
+      "node_modules/@tamagui/font-inter/otf/Inter-Medium.otf",
+      "node_modules/@tamagui/font-inter/otf/Inter-Regular.otf"
+    ]
   }
 }

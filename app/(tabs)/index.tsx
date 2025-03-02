@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { todoSelectSchema } from '@/db/schema';
 import { z } from 'zod';
+import { useAuth } from '@clerk/clerk-expo';
+import { Redirect, Stack } from 'expo-router'
 
 const API_URL = '/todos';
 
 export default function TodoApp() {
+  const { isSignedIn } = useAuth()
+
+  if (!isSignedIn) {
+    return <Redirect href="/(auth)/sign-in" />
+  }
+
   const [todos, setTodos] = useState<(z.infer<typeof todoSelectSchema>)[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
