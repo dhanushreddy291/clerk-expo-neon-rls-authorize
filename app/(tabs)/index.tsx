@@ -3,14 +3,17 @@ import { View, Text, TextInput, Button, FlatList, TouchableOpacity, StyleSheet }
 import { todoSelectSchema } from '@/db/schema';
 import { z } from 'zod';
 import { useAuth } from '@clerk/clerk-expo';
-import { Redirect, Stack } from 'expo-router'
-
-const API_URL = '/todos';
+import { Redirect } from 'expo-router'
+import { db } from "@/db/client";
+import { useSession } from '@clerk/clerk-expo';
+import { todos as todosTable } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 export default function TodoApp() {
-  const { isSignedIn } = useAuth()
+  const { isLoaded, isSignedIn, userId } = useAuth();
+  const { session } = useSession();
 
-  if (!isSignedIn) {
+  if (isLoaded && !isSignedIn) {
     return <Redirect href="/(auth)/sign-in" />
   }
 
@@ -19,15 +22,20 @@ export default function TodoApp() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState('');
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
-
   const fetchTodos = async () => {
     try {
-      const response = await fetch(API_URL);
-      const data = (await response.json()) as z.infer<typeof todoSelectSchema>[];
-      setTodos(data);
+      if (!session) {
+        return;
+      }
+      const authToken = await session.getToken();
+      if (!authToken) {
+        return;
+      }
+      const response = await db
+        .$withAuth(authToken)
+        .select()
+        .from(todosTable);
+      setTodos(response);
     } catch (error) {
       console.error('Error fetching todos:', error);
     }
@@ -36,27 +44,38 @@ export default function TodoApp() {
   const addTodo = async () => {
     if (!newTitle.trim()) return;
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle, completed: 'false', user_id: null }),
-      });
-      if (response.ok) {
-        setNewTitle('');
-        fetchTodos();
+      if (!session) {
+        return;
       }
-    } catch (error) {
+      const authToken = await session.getToken();
+      if (!authToken) {
+        return;
+      }
+      const response = await db
+        .$withAuth(authToken)
+        .insert(todosTable)
+        .values({ title: newTitle, userId: userId });
+      setNewTitle('');
+      fetchTodos();
+    }
+    catch (error) {
       console.error('Error adding todo:', error);
     }
   };
 
   const deleteTodo = async (id: number) => {
     try {
-      await fetch(`${API_URL}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
+      if (!session) {
+        return;
+      }
+      const authToken = await session.getToken();
+      if (!authToken) {
+        return;
+      }
+      await db
+        .$withAuth(authToken)
+        .delete(todosTable)
+        .where(eq(todosTable.id, id));
       fetchTodos();
     } catch (error) {
       console.error('Error deleting todo:', error);
@@ -65,16 +84,30 @@ export default function TodoApp() {
 
   const updateTodo = async (id: number, updatedTitle: string) => {
     try {
-      await fetch(`${API_URL}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: updatedTitle, completed: 'false', id }),
-      });
+      if (!session) {
+        return;
+      }
+      const authToken = await session.getToken();
+      if (!authToken) {
+        return;
+      }
+      await db
+        .$withAuth(authToken)
+        .update(todosTable)
+        .set({ title: updatedTitle })
+        .where(eq(todosTable.id, id));
       fetchTodos();
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error updating todo:', error);
     }
   };
+
+  useEffect(() => {
+    fetchTodos();
+  }, [session]);
+
+
 
   const startEditing = (id: number, title: string) => {
     setEditingId(id);
