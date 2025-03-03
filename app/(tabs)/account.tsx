@@ -1,15 +1,17 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useAuth, useUser } from '@clerk/clerk-expo';
-import { Redirect } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 
 export default function AccountDetailsScreen() {
   const { isLoaded, isSignedIn, signOut } = useAuth();
   const { user } = useUser();
+  const router = useRouter();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      router.replace('/(auth)/sign-in');
     } catch (error) {
       Alert.alert('Error', 'Failed to sign out. Please try again.');
     }
