@@ -165,11 +165,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#fff',
+    fontFamily: 'EduNSWACTFoundation-VariableFont_wght'
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 10
   },
   input: {
     borderWidth: 1,

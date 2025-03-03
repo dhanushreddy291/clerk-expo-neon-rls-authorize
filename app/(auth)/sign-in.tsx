@@ -59,6 +59,7 @@ export default function SignInScreen() {
             fontWeight: "700",
             color: isDarkMode ? "#EAEAEA" : "#333",
             marginBottom: 16,
+            fontFamily: 'EduNSWACTFoundation-VariableFont_wght'
           }}
         >
           Sign in
@@ -80,6 +81,7 @@ export default function SignInScreen() {
             borderRadius: 8,
             paddingVertical: 10,
             width: 260,
+            fontFamily: 'EduNSWACTFoundation-VariableFont_wght'
           })}
         >
           <AntDesign name="google" size={16} color={isDarkMode ? "#444" : "#777"} />
@@ -88,6 +90,7 @@ export default function SignInScreen() {
               fontWeight: "600",
               color: isDarkMode ? "#222" : "#333",
               marginLeft: 8,
+              fontFamily: 'EduNSWACTFoundation-VariableFont_wght'
             }}
           >
             Continue with Google

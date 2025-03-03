@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f3f5f7',
     padding: 20,
-    alignItems: 'center',
+    alignItems: 'center'
   },
   center: {
     flex: 1,
