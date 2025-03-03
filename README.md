@@ -1,4 +1,4 @@
-# Neon RLS Authorize + Clerk
+# Clerk + Expo Quickstart with Neon RLS Authorize
 
 A quick start Expo template demonstrating secure user authentication and authorization using Neon RLS Authorize with Clerk integration. This guide uses SQL from the client to enforce row-level security policies.
 
