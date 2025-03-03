@@ -3,8 +3,7 @@
 A quick start Expo template demonstrating secure user authentication and authorization using Neon RLS Authorize with Clerk integration. This guide uses SQL from the client to enforce row-level security policies.
 
 > [!IMPORTANT]  
-> WIP
-> I built this project because I couldn't find a simple, easy-to-understand example of Expo with Clerk auth on GitHub. So, I decided to make one myself! It's going to be my go-to template for future projects. I'm having a blast learning mobile app development, and right now, I'm diving into CI/CD. I'm trying to automate deployments to the Google Play Store and the Apple App Store (yeah, I know EAS does a lot of that, but I want to learn the ins and outs). If you're a pro at mobile deployment automation and want to share your knowledge, I'd love your help! Pull requests are more than welcome. Thanks for checking it out!
+> WIP: I built this project because I couldn't find a simple, easy-to-understand example of Expo with Clerk auth on GitHub. So, I decided to make one myself! It's going to be my go-to template for future projects. I'm having a blast learning mobile app development, and right now, I'm diving into CI/CD. I'm trying to automate deployments to the Google Play Store and the Apple App Store (yeah, I know EAS does a lot of that, but I want to learn the ins and outs). If you're a pro at mobile deployment automation and want to share your knowledge, I'd love your help! Pull requests are more than welcome. Thanks for checking it out!
 
 ## Features
 
