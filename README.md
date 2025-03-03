@@ -85,18 +85,23 @@ Deploy directly to your preferred hosting platform:
 4. Run the database migrations:
 
     ```bash
-    npm run drizzle:generate  # or bun run drizzle:generate
-    npm run drizzle:migrate  # or bun run drizzle:migrate
+    npm run drizzle:generate
+    npm run drizzle:migrate
     ```
 
 5. Start the development server:
 
     ```bash
-    npm run dev
+    npm run start
     ```
 
-6. Visit `http://localhost:3000` to see the application running
-    ![Expo example todo app](/images/expo-example-todo-app.png)
+    Open the app by scanning the QR code with the Expo Go app on your phone or by running the following command:
+
+    - Open in ios simulator: `i`
+    - Open in android emulator: `a`
+    - Open in web browser: `w`
+
+    ![Expo example todo app](images/expo-todo-app-with-auth.png)
 
 ## Important: Production Setup
 
