@@ -95,7 +95,7 @@ Deploy directly to your preferred hosting platform:
     npm run start
     ```
 
-    Open the app by scanning the QR code with the Expo Go app on your phone or by running the following command:
+    Open the app by scanning the QR code with the [Expo Go app](https://expo.dev/go) on your phone or by running the following command:
 
     - Open in ios simulator: `i`
     - Open in android emulator: `a`
